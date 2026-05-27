@@ -4,16 +4,12 @@ export type LeadsVerifyEmailsInput = {
 
 export type LeadsVerifyEmailsOutput = {
   success: boolean
-  verifiedCount: number
-  results: Array<{
-    leadId: number
-    emailVerified: boolean | null
-  }>
+  startedCount: number
+  alreadyRunning: number[]
   errors: Array<{
     leadId: number
     leadName: string
     error: string
   }>
 }
-
 
