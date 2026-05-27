@@ -1,10 +1,11 @@
-export type LeadsVerifyEmailsInput = {
+export type LeadsEnrichPhoneInput = {
   leadIds: number[]
 }
 
-export type LeadsVerifyEmailsOutput = {
+export type LeadsEnrichPhoneOutput = {
   success: boolean
   startedCount: number
+  started: number[]
   alreadyRunning: number[]
   errors: Array<{
     leadId: number
@@ -12,4 +13,3 @@ export type LeadsVerifyEmailsOutput = {
     error: string
   }>
 }
-
