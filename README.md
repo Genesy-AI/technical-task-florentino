@@ -57,33 +57,42 @@ Set the provided `ANTHROPIC_API_KEY` in your shell before running the project:
 export ANTHROPIC_API_KEY="your-provided-key"
 ```
 
-**Monorepo (one‑time)**
+**Backend (one‑time)**
 
 ```zsh
+cd backend
 nvm use                   # Ensure the Node version from .nvmrc
-pnpm install              # Install all workspace dependencies
-pnpm --filter interview-take-home-c-backend migrate:dev
-pnpm --filter interview-take-home-c-backend gen:prisma
-temporal server start-dev # Starts Temporal server
+pnpm install              # Install dependencies
+pnpm migrate:dev          # Sync local SQLite with Prisma schema
+pnpm gen:prisma           # Generate Prisma client
+temporal server start-dev # Starts Temporal server
 ```
 
 **Backend (develop)**
 
 ```zsh
-pnpm dev:backend          # From repo root
-# or: cd backend && pnpm run dev
+cd backend
+pnpm run dev           # Starts the API server
 ```
 
 When you change the [Prisma](https://www.prisma.io/docs) schema:
 ```zsh
-pnpm --filter interview-take-home-c-backend migrate:dev
+pnpm migrate:dev
+```
+
+**Frontend (one‑time)**
+
+```zsh
+cd frontend
+nvm use                # Ensure the Node version from .nvmrc
+pnpm install
 ```
 
 **Frontend (develop)**
 
 ```zsh
-pnpm dev:frontend         # From repo root
-# or: cd frontend && pnpm run dev
+cd frontend
+pnpm run dev           # Starts the dev server
 ```
 
 ## Task Description
