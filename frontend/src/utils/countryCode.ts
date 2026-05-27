@@ -1,6 +1,11 @@
 /** ISO 3166-1 alpha-2: exactly two uppercase ASCII letters (e.g. US, ES). */
 export const ISO_3166_ALPHA2_REGEX = /^[A-Z]{2}$/
 
+/** ISO 3166-1 alpha-3 → alpha-2 (subset used in CSV imports). */
+export const ISO_3166_ALPHA3_TO_ALPHA2: Readonly<Record<string, string>> = {
+  USA: 'US',
+}
+
 export function isIso3166Alpha2(code: string): boolean {
   return ISO_3166_ALPHA2_REGEX.test(code)
 }
@@ -21,11 +26,18 @@ export function normalizeCountryCode(value: string | undefined): string | undefi
 
   if (!cleaned) return undefined
 
-  const lettersOnly = cleaned.replace(/[^A-Za-z]/g, '')
-  if (lettersOnly.length !== 2) return undefined
+  const lettersOnly = cleaned.replace(/[^A-Za-z]/g, '').toUpperCase()
 
-  const alpha2 = lettersOnly.toUpperCase()
-  return isIso3166Alpha2(alpha2) ? alpha2 : undefined
+  if (lettersOnly.length === 2) {
+    return isIso3166Alpha2(lettersOnly) ? lettersOnly : undefined
+  }
+
+  if (lettersOnly.length === 3) {
+    const alpha2 = ISO_3166_ALPHA3_TO_ALPHA2[lettersOnly]
+    return alpha2 && isIso3166Alpha2(alpha2) ? alpha2 : undefined
+  }
+
+  return undefined
 }
 
 export function stripCsvBom(content: string): string {

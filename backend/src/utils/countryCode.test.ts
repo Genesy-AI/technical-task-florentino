@@ -12,7 +12,11 @@ describe('normalizeCountryCode (backend)', () => {
       expect(normalizeCountryCode('VVM=')).toBeNull()
     })
 
-    it('When the value is an invalid three-letter code, Then it is rejected', () => {
+    it('When the value is USA (alpha-3), Then it is normalized to US (alpha-2)', () => {
+      expect(normalizeCountryCode('USA')).toBe('US')
+    })
+
+    it('When the value is an unknown three-letter code, Then it is rejected', () => {
       expect(normalizeCountryCode('XXX')).toBeNull()
     })
   })

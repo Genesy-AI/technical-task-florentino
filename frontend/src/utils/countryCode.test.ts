@@ -28,9 +28,19 @@ describe('normalizeCountryCode', () => {
     })
   })
 
+  describe('Given an ISO 3166-1 alpha-3 country value', () => {
+    it('When the value is USA, Then it is normalized to US', () => {
+      expect(normalizeCountryCode('USA')).toBe('US')
+    })
+
+    it('When the value is usa in lowercase, Then it is normalized to US', () => {
+      expect(normalizeCountryCode('usa')).toBe('US')
+    })
+  })
+
   describe('Given an invalid country value', () => {
-    it('When the value is not two letters, Then it returns undefined', () => {
-      expect(normalizeCountryCode('USA')).toBeUndefined()
+    it('When the value is not a known alpha-2 or alpha-3 code, Then it returns undefined', () => {
+      expect(normalizeCountryCode('XXX')).toBeUndefined()
       expect(normalizeCountryCode('12')).toBeUndefined()
       expect(normalizeCountryCode('VVM=')).toBeUndefined()
     })
@@ -68,6 +78,17 @@ John,Doe,john@test.com,us`
     it('When the file is parsed, Then country codes are not garbled by the BOM', () => {
       const csv = stripCsvBom(`\uFEFFfirstName,lastName,email,countryCode
 Jane,Doe,jane@test.com,US`)
+
+      const result = parseCsv(csv)
+
+      expect(result[0].countryCode).toBe('US')
+    })
+  })
+
+  describe('Given a CSV row with country value USA', () => {
+    it('When the file is parsed, Then the country code is stored as US', () => {
+      const csv = `firstName,lastName,email,country
+Jane,Smith,jane@example.com,USA`
 
       const result = parseCsv(csv)
 
