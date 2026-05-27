@@ -7,3 +7,6 @@ const { verifyEmail } = proxyActivities<typeof activities>(VERIFY_EMAIL_ACTIVITY
 export async function verifyEmailWorkflow(email: string): Promise<boolean> {
   return await verifyEmail(email)
 }
+
+export { enrichPhoneWorkflow } from './enrichPhoneWorkflow'
+export type { EnrichPhoneWorkflowResult } from './enrichPhoneWorkflow'
