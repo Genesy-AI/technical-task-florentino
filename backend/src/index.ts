@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client'
 import express, { Request, Response } from 'express'
 import { Connection, Client } from '@temporalio/client'
 import { verifyEmailWorkflow } from './workflows'
+import { VERIFY_EMAIL_WORKFLOW_TIMEOUT } from './workflows/verifyEmailConfig'
 import { generateMessageFromTemplate } from './utils/messageGenerator'
 import { runTemporalWorker } from './worker'
 const prisma = new PrismaClient()
@@ -286,6 +287,7 @@ app.post('/leads/verify-emails', async (req: Request, res: Response) => {
           taskQueue: 'myQueue',
           workflowId: `verify-email-${lead.id}-${Date.now()}`,
           args: [lead.email],
+          workflowExecutionTimeout: VERIFY_EMAIL_WORKFLOW_TIMEOUT,
         })
 
         await prisma.lead.update({
