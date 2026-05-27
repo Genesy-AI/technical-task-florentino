@@ -19,6 +19,7 @@ model lead {
   companyName String?
   message     String?
   emailVerified Boolean?
+  emailVerificationStatus String?
   phone       String?
   phoneEnrichmentStatus String?
   phoneEnrichmentProvider String?
