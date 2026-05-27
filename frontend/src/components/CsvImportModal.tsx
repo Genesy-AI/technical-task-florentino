@@ -66,7 +66,7 @@ export const CsvImportModal: FC<CsvImportModalProps> = ({ isOpen, onClose }) => 
       toast.error('Error reading file')
       setIsProcessing(false)
     }
-    reader.readAsText(file)
+    reader.readAsText(file, 'UTF-8')
   }
 
   const handleDrop = useCallback((e: React.DragEvent) => {
@@ -237,8 +237,7 @@ export const CsvImportModal: FC<CsvImportModalProps> = ({ isOpen, onClose }) => 
                     </button>
                   </p>
                   <p className="text-sm text-gray-500">
-                    CSV must include: firstName, lastName, email (required). Optional: jobTitle, countryCode,
-                    companyName
+                    CSV must include: firstName, lastName, email (required). Optional: jobTitle, countryCode (ISO 3166-1 alpha-2), companyName
                   </p>
                 </div>
               )}

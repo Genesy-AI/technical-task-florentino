@@ -1,4 +1,5 @@
 import Papa from 'papaparse'
+import { normalizeCountryCode, stripCsvBom } from './countryCode'
 
 export interface CsvLead {
   firstName: string
@@ -18,11 +19,13 @@ export const isValidEmail = (email: string): boolean => {
 }
 
 export const parseCsv = (content: string): CsvLead[] => {
-  if (!content?.trim()) {
+  const sanitizedContent = stripCsvBom(content)
+
+  if (!sanitizedContent?.trim()) {
     throw new Error('CSV content cannot be empty')
   }
 
-  const parseResult = Papa.parse<Record<string, string>>(content, {
+  const parseResult = Papa.parse<Record<string, string>>(sanitizedContent, {
     header: true,
     skipEmptyLines: true,
     transform: (value) => value.trim(),
@@ -67,8 +70,9 @@ export const parseCsv = (content: string): CsvLead[] => {
         case 'jobtitle':
           lead.jobTitle = trimmedValue || undefined
           break
+        case 'country':
         case 'countrycode':
-          lead.countryCode = trimmedValue || undefined
+          lead.countryCode = normalizeCountryCode(trimmedValue)
           break
         case 'companyname':
           lead.companyName = trimmedValue || undefined
