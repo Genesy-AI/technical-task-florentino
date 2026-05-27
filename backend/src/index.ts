@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client'
 import express, { Request, Response } from 'express'
 import { Connection, Client } from '@temporalio/client'
+import { startPhoneEnrichmentWorkflows } from './phoneEnrichment/startWorkflows'
 import { verifyEmailWorkflow } from './workflows'
 import { VERIFY_EMAIL_WORKFLOW_TIMEOUT } from './workflows/verifyEmailConfig'
 import { generateMessageFromTemplate } from './utils/messageGenerator'
@@ -251,6 +252,46 @@ app.post('/leads/bulk', async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error importing leads:', error)
     res.status(500).json({ error: 'Failed to import leads' })
+  }
+})
+
+app.post('/leads/enrich-phone', async (req: Request, res: Response) => {
+  if (!req.body || typeof req.body !== 'object') {
+    return res.status(400).json({ error: 'Request body is required and must be valid JSON' })
+  }
+
+  const { leadIds } = req.body as { leadIds?: number[] }
+
+  if (!Array.isArray(leadIds) || leadIds.length === 0) {
+    return res.status(400).json({ error: 'leadIds must be a non-empty array' })
+  }
+
+  try {
+    const leads = await prisma.lead.findMany({
+      where: { id: { in: leadIds.map((id) => Number(id)) } },
+    })
+
+    if (leads.length === 0) {
+      return res.status(404).json({ error: 'No leads found with the provided IDs' })
+    }
+
+    const connection = await Connection.connect({ address: 'localhost:7233' })
+    const client = new Client({ connection, namespace: 'default' })
+
+    const { started, alreadyRunning, errors } = await startPhoneEnrichmentWorkflows(client, leads)
+
+    await connection.close()
+
+    res.json({
+      success: true,
+      startedCount: started.length,
+      started,
+      alreadyRunning,
+      errors,
+    })
+  } catch (error) {
+    console.error('Error starting phone enrichment:', error)
+    res.status(500).json({ error: 'Failed to start phone enrichment' })
   }
 })
 
